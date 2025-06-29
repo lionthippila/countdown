@@ -4,35 +4,30 @@
   <meta charset="UTF-8" />
   <title>นับถอยหลัง QR PromptPay</title>
   <style>
-    /* Reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    /* Body ใช้ flexbox จัดกึ่งกลาง */
     body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f8ff; /* เปลี่ยนสีพื้นหลังตรงนี้ */
-    color: #333;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 16px;
-    user-select: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 16px;
+      user-select: none;
     }
-
-    /* หัวเรื่อง */
     h2 {
       font-weight: 600;
       font-size: 1.4rem;
       margin-bottom: 1rem;
       color: #222;
     }
-    /* รูป QR */
     #qr {
       width: 180px;
       height: 180px;
@@ -43,7 +38,6 @@
       object-fit: contain;
       background-color: #fff;
     }
-    /* ตัวนับเวลาถอยหลัง */
     #countdown {
       font-size: 1.2rem;
       font-weight: 600;
@@ -52,30 +46,43 @@
       font-variant-numeric: tabular-nums;
     }
     .container {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    display: inline-block; /* ให้กล่องพอดีกับเนื้อหา */
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: inline-block;
+      max-width: 320px;
     }
-
+    .logo {
+      height: 40px;
+      margin-bottom: 12px;
+    }
+    .expired {
+      color: red;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-    <div class="container">
-        <h2>สแกน QR เพื่อชำระเงิน</h2>
-        <img id="qr" src="" alt="QR Code" />
-        <div id="countdown">กำลังโหลด...</div>
-    </div>
-
+  <div class="container">
+    <img class="logo" src="https://promptpay.io/assets/img/logo.png" alt="PromptPay Logo" />
+    <h2>สแกน QR เพื่อชำระเงิน</h2>
+    <img id="qr" src="" alt="QR Code" />
+    <div id="countdown">กำลังโหลด...</div>
+  </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const expiresStr = urlParams.get('expires');
     const qr = urlParams.get('qr');
+    const amount = urlParams.get('amount');
 
-    if (!expiresStr || !qr) {
-      document.getElementById('countdown').innerText = "ข้อมูลไม่ครบถ้วน";
+    if (!expiresStr || !qr || !amount) {
+      document.querySelector('.container').innerHTML = `
+        <p class="expired">❌ ข้อมูลไม่ครบถ้วน</p>
+        <p>กรุณาตรวจสอบลิงก์อีกครั้ง</p>
+      `;
     } else {
       const expires = new Date(expiresStr);
       document.getElementById('qr').src = decodeURIComponent(qr);
@@ -85,13 +92,16 @@
         const diff = expires.getTime() - now.getTime();
 
         if (diff <= 0) {
-          document.getElementById('countdown').innerText = "หมดเวลาแล้ว";
+          document.querySelector('.container').innerHTML = `
+            <img class="logo" src="https://promptpay.io/assets/img/logo.png" alt="PromptPay Logo" />
+            <h2 style="color: red;">⛔ ลิงก์นี้หมดอายุแล้ว ⛔</h2>
+            <p>กรุณาขอ QR ใหม่จาก LINE Bot</p>
+          `;
           return;
         }
 
         const minutes = Math.floor(diff / 60000);
         const seconds = Math.floor((diff % 60000) / 1000);
-
         document.getElementById('countdown').innerText = `เหลือเวลาอีก ${minutes} นาที ${seconds} วินาที`;
         setTimeout(updateCountdown, 1000);
       }
