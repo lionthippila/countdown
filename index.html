@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>นับถอยหลัง QR PromptPay</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 16px;
+      user-select: none;
+    }
+    h2 {
+      font-weight: 600;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: #222;
+    }
+    #qr {
+      width: 180px;
+      height: 180px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 1.25rem;
+      object-fit: contain;
+      background-color: #fff;
+    }
+    #countdown {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #FF6600;
+      min-height: 1.5em;
+      font-variant-numeric: tabular-nums;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: inline-block;
+      max-width: 320px;
+    }
+    .logo {
+      height: 40px;
+      margin-bottom: 12px;
+    }
+    .expired {
+      color: red;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/PromptPay.jpg" alt="PromptPay Logo" style="height:40px;">
+    <h2>สแกน QR เพื่อชำระเงิน</h2>
+    <img id="qr" src="" alt="QR Code" />
+    <div id="countdown">กำลังโหลด...</div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const expiresStr = urlParams.get('expires');
+    const qr = urlParams.get('qr');
+    const amount = urlParams.get('amount');
+
+    if (!expiresStr || !qr || !amount) {
+      document.querySelector('.container').innerHTML = `
+        <p class="expired">❌ ข้อมูลไม่ครบถ้วน</p>
+        <p>กรุณาตรวจสอบลิงก์อีกครั้ง</p>
+      `;
+    } else {
+      const expires = new Date(expiresStr);
+      document.getElementById('qr').src = decodeURIComponent(qr);
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = expires.getTime() - now.getTime();
+
+        if (diff <= 0) {
+          document.querySelector('.container').innerHTML = `
+            <img src="/PromptPay.jpg" alt="PromptPay Logo" style="height:40px;">
+            <h2 style="color: red;">⛔ ลิงก์นี้หมดอายุแล้ว ⛔</h2>
+            <p>กรุณาขอ QR ใหม่จาก LINE Bot</p>
+          `;
+          return;
+        }
+
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        document.getElementById('countdown').innerText = `เหลือเวลาอีก ${minutes} นาที ${seconds} วินาที`;
+        setTimeout(updateCountdown, 1000);
+      }
+
+      updateCountdown();
+    }
+  </script>
+</body>
+</html>
