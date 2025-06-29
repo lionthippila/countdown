@@ -15,7 +15,6 @@
   <div id="countdown">กำลังโหลด...</div>
 
   <script>
-    // ดึงพารามิเตอร์จาก URL
     const urlParams = new URLSearchParams(window.location.search);
     const expiresStr = urlParams.get('expires');
     const qr = urlParams.get('qr');
@@ -26,15 +25,9 @@
       const expires = new Date(expiresStr);
       document.getElementById('qr').src = decodeURIComponent(qr);
 
-      console.log('expires:', expires.toISOString());
-      console.log('now (local):', new Date().toISOString());
-
       function updateCountdown() {
-        // ใช้เวลาปัจจุบัน UTC โดยปรับ offset ของ timezone
-        const nowLocal = new Date();
-        const nowUtc = new Date(nowLocal.getTime() + nowLocal.getTimezoneOffset() * 60000);
-
-        const diff = expires.getTime() - nowUtc.getTime();
+        const now = new Date();
+        const diff = expires.getTime() - now.getTime();
 
         if (diff <= 0) {
           document.getElementById('countdown').innerText = "หมดเวลาแล้ว";
