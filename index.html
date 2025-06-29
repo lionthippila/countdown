@@ -1,18 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
   <meta charset="UTF-8" />
   <title>นับถอยหลัง QR PromptPay</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    #countdown { font-size: 2em; color: #FF6600; }
-    #qr { margin-top: 20px; }
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    /* Body ใช้ flexbox จัดกึ่งกลาง */
+    body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f8ff; /* เปลี่ยนสีพื้นหลังตรงนี้ */
+    color: #333;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    user-select: none;
+    }
+
+    /* หัวเรื่อง */
+    h2 {
+      font-weight: 600;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: #222;
+    }
+    /* รูป QR */
+    #qr {
+      width: 180px;
+      height: 180px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 1.25rem;
+      object-fit: contain;
+      background-color: #fff;
+    }
+    /* ตัวนับเวลาถอยหลัง */
+    #countdown {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #FF6600;
+      min-height: 1.5em;
+      font-variant-numeric: tabular-nums;
+    }
+    .container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: inline-block; /* ให้กล่องพอดีกับเนื้อหา */
+    }
+
   </style>
 </head>
 <body>
-  <h2>สแกน QR เพื่อชำระเงิน</h2>
-  <img id="qr" src="" alt="QR Code" width="200" height="200" />
-  <div id="countdown">กำลังโหลด...</div>
+    <div class="container">
+        <h2>สแกน QR เพื่อชำระเงิน</h2>
+        <img id="qr" src="" alt="QR Code" />
+        <div id="countdown">กำลังโหลด...</div>
+    </div>
+
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
