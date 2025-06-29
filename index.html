@@ -1,61 +1,49 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PromptPay Countdown</title>
+  <title>นับถอยหลัง QR PromptPay</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2em;
-    }
-    #timer {
-      font-size: 2em;
-      color: red;
-      margin: 20px 0;
-    }
-    .btn {
-      display: inline-block;
-      background-color: #00aa00;
-      color: white;
-      padding: 12px 24px;
-      font-size: 1.2em;
-      border-radius: 10px;
-      text-decoration: none;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #countdown { font-size: 2em; color: #FF6600; }
+    #qr { margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2 id="amount">ยอดชำระ: ... บาท</h2>
-  <p id="timer">...</p>
-  <a id="qr" class="btn" target="_blank">เปิด QR</a>
+  <h2>สแกน QR เพื่อชำระเงิน</h2>
+  <img id="qr" src="" alt="QR Code" width="200" height="200" />
+  <div id="countdown">กำลังโหลด...</div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const amount = params.get("amount");
-    const expires = new Date(params.get("expires"));
-    const qr = params.get("qr");
+    // ดึงพารามิเตอร์จาก URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const expiresStr = urlParams.get('expires');
+    const qr = urlParams.get('qr');
 
-    document.getElementById("amount").textContent = `ยอดชำระ: ${amount} บาท`;
-    document.getElementById("qr").href = qr;
+    if (!expiresStr || !qr) {
+      document.getElementById('countdown').innerText = "ข้อมูลไม่ครบถ้วน";
+    } else {
+      const expires = new Date(expiresStr);
+      document.getElementById('qr').src = decodeURIComponent(qr);
 
-    function updateTimer() {
-      const now = new Date();
-      const diff = Math.max(0, Math.floor((expires - now) / 1000));
-      const min = Math.floor(diff / 60);
-      const sec = diff % 60;
+      function updateCountdown() {
+        const now = new Date();
+        const diff = expires - now;
 
-      if (diff <= 0) {
-        document.getElementById("timer").textContent = "หมดเวลาแล้ว!";
-        document.getElementById("timer").style.color = "gray";
-      } else {
-        document.getElementById("timer").textContent = `เหลือเวลา: ${min} นาที ${sec} วินาที`;
+        if (diff <= 0) {
+          document.getElementById('countdown').innerText = "หมดเวลาแล้ว";
+          return;
+        }
+
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+
+        document.getElementById('countdown').innerText = `เหลือเวลาอีก ${minutes} นาที ${seconds} วินาที`;
+        setTimeout(updateCountdown, 1000);
       }
-    }
 
-    updateTimer();
-    setInterval(updateTimer, 1000);
+      updateCountdown();
+    }
   </script>
 </body>
 </html>
